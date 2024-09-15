@@ -12,9 +12,9 @@ int main()
 
 	list2.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
 	list2.Sort();
+	auto end = std::chrono::high_resolution_clock::now();
 	list2.PrintAll();
 
-	auto end = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsed = end - start;
 	std::cout << "Operation took " << elapsed.count() << " seconds." << std::endl;
 }

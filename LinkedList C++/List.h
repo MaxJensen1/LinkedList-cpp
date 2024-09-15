@@ -11,6 +11,7 @@ private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
 	std::string TryParse(T input);
+	int listLength = 0;
 
 public:
 	List() // Constructor. It sets the head to null by default
@@ -82,6 +83,7 @@ inline void List<T>::Add(T input)
 
 		// Add the input at the end of the list
 		current->next = new Node<T>(input);
+		listLength++;
 	}
 }
 
@@ -99,6 +101,7 @@ inline void List<T>::PrintAll()
 template<typename T>
 inline int List<T>::GetLength()
 {
+	/*
 	int count = 0;
 	Node<T>* current = head;
 
@@ -109,6 +112,9 @@ inline int List<T>::GetLength()
 	}
 
 	return count;
+	*/
+	// The code above counts in a better way, but is a lot slower than keeping track of the length when adding elements or clearing the list
+	return listLength;
 }
 
 template<typename T>
@@ -125,6 +131,7 @@ inline void List<T>::Clear()
 
 	// Can't delete head because then the list would be gone, but I can set it to null so it's empty. 
 	head = nullptr;
+	listLength = 0;
 }
 
 template<typename T>
