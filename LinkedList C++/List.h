@@ -2,6 +2,7 @@
 #include "Node.h"
 #include <string>
 #include <sstream>
+#include <fstream>
 
 template <typename T>
 class List
@@ -23,6 +24,7 @@ public:
 	int GetLength();
 	void Clear();
 	bool Contains(T input);
+	void AddTextFromFile(const std::string& fileName);
 };
 
 template<typename T>
@@ -137,7 +139,28 @@ inline bool List<T>::Contains(T input)
 		}
 		current = current->next;
 	}
+
 	return false;
+}
+
+template<typename T>
+inline void List<T>::AddTextFromFile(const std::string& fileName)
+{
+	std::ifstream inputFile(fileName); // Open the file with the provided file name
+	std::string line;
+
+	while (std::getline(inputFile, line)) // Read the file one line at at time and input it to the line string
+	{
+		std::stringstream stream(line); // Create a stream from the line
+		std::string word;
+
+		while (stream >> word) // Read the line one word at a time and input it to the word string
+		{
+			Add(word); // Add the word to the list
+		}
+	}
+
+	inputFile.close(); // Close the file
 }
 
 template<typename T>

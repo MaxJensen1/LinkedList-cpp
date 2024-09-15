@@ -2,19 +2,19 @@
 #include <iostream>
 #include "List.h"
 #include <string>
+#include <chrono>
 
 int main()
 {
-	List<std::string> list;
-	list.Add("dfdf");
-	list.Add("12s");
-	list.Add("1.4");
-	list.Add("1.7");
-	list.Add("0.5");
-	list.Add("12g");
+	List<std::string> list2;
 
-	list.PrintAll();
-	list.Sort();
-	std::cout << std::endl;
-	list.PrintAll();
+	auto start = std::chrono::high_resolution_clock::now();
+
+	list2.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
+	list2.Sort();
+	list2.PrintAll();
+
+	auto end = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+	std::cout << "Operation took " << elapsed.count() << " seconds." << std::endl;
 }
