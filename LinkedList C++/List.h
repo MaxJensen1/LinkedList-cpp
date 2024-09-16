@@ -9,10 +9,10 @@ class List
 {
 private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
-	void SwapNodes(Node<T>* node1, Node<T>* node2);
-	std::string TryParse(T input);
 	int listLength = 0;
 
+	void SwapNodes(Node<T>* node1, Node<T>* node2);
+	std::string TryParse(T input);
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
 	Node<T>* StartMergeSort(Node<T>* head);
@@ -70,7 +70,7 @@ inline void List<T>::MergeSort()
 template<typename T>
 inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 {
-	if (node1 == nullptr || node2 == nullptr) return; // Safety check to avoid crashes
+	if (node1 == nullptr || node2 == nullptr) { return; } // Safety check to avoid crashes
 
 	// Swap the value of the two nodes
 	T temporary = node1->GetValue();
@@ -166,24 +166,31 @@ inline bool List<T>::Contains(T input)
 }
 
 template<typename T>
-inline void List<T>::AddTextFromFile(const std::string& fileName)
+void List<T>::AddTextFromFile(const std::string& fileName) 
 {
-	std::ifstream inputFile(fileName); // Open the file with the provided file name
+	std::ifstream inputFile(fileName);
 	std::string line;
 
-	while (std::getline(inputFile, line)) // Read the file one line at at time and input it to the line string
+	while (std::getline(inputFile, line)) 
 	{
-		std::stringstream stream(line); // Create a stream from the line
+		std::stringstream stream(line);
 		std::string word;
 
-		while (stream >> word) // Read the line one word at a time and input it to the word string
+		while (stream >> word) 
 		{
-			Add(word); // Add the word to the list
+			// Remove any commas or periods
+			if (!word.empty() && (word.back() == ',' || word.back() == '.' || word.back() == ')'))
+			{
+				word.pop_back();
+			}
+			// Add the word to the list
+			Add(word);
 		}
 	}
 
-	inputFile.close(); // Close the file
+	inputFile.close();
 }
+
 
 //template<typename T>
 //inline std::string List<T>::TryParse(T input)
@@ -260,7 +267,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	// Compare the two halves and merge them accordingly
 	if (TryParse(firstHalf->GetValue()) <= TryParse(secondHalf->GetValue())) 
 	{
-		std::cout << "Merging 1: '" << TryParse(firstHalf->GetValue()) << "' and '" << TryParse(secondHalf->GetValue()) << "'" << std::endl;
+		//std::cout << "Merging 1: '" << TryParse(firstHalf->GetValue()) << "' and '" << TryParse(secondHalf->GetValue()) << "'" << std::endl;
 		// First node of the first half is smaller, so link it to the merged list
 		mergedList = firstHalf;
 		// Recursively merge the rest of firstHalf with the secondHalf
@@ -272,7 +279,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 		mergedList = secondHalf;
 		// Recursively merge the firstHalf with the rest of secondHalf
 		mergedList->next = Merge(firstHalf, secondHalf->next);
-		std::cout << "Merging 2: '" << TryParse(secondHalf->GetValue()) << "' and '" << TryParse(firstHalf->GetValue()) << "'" << std::endl;
+		//std::cout << "Merging 2: '" << TryParse(secondHalf->GetValue()) << "' and '" << TryParse(firstHalf->GetValue()) << "'" << std::endl;
 	}
 
 	return mergedList;
