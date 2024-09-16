@@ -13,6 +13,10 @@ private:
 	std::string TryParse(T input);
 	int listLength = 0;
 
+	Node<T>* SplitListInHalf(Node<T>* head);
+	Node<T>* SortedMerge(Node<T>* left, Node<T>* right);
+	Node<T>* MergeSort(Node<T>* head);
+
 public:
 	List() // Constructor. It sets the head to null by default
 	{
@@ -20,6 +24,7 @@ public:
 	}
 
 	void Sort();
+	void Sort2();
 	void Add(T input);
 	void PrintAll();
 	int GetLength();
@@ -53,6 +58,12 @@ inline void List<T>::Sort() // Sorting algorithm of the type bubble sort
 			current = current->next;
 		}
 	}
+}
+
+template<typename T>
+inline void List<T>::Sort2()
+{
+	head = MergeSort(head);
 }
 
 template<typename T>
@@ -185,4 +196,29 @@ inline std::string List<T>::TryParse(T input)
 		return result;
 	}
 	else { return ""; } // Returning empty string if failed to avoid errors
+}
+
+template<typename T>
+inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
+{
+	if (head == nullptr) return head; // Can't find the middle of an empty list
+
+	Node<T>* slowPointer = head;
+	Node<T>* fastPointer = head;
+
+	/* Move the fast pointer two steps and the slow pointer one 
+	step until the fast one is at the end of the list. This is how the middle of the list is found.*/
+	while (fastPointer != nullptr && fastPointer->next != nullptr) 
+	{
+		fastPointer = fastPointer->next->next;
+		if (fastPointer != nullptr) 
+		{
+			slowPointer = slowPointer->next;
+		}
+	}
+
+	// Split the list into two halves
+	Node<T>* temporary = slowPointer->next;
+	slowPointer->next = nullptr;
+	return temporary;
 }
