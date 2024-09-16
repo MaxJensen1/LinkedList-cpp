@@ -12,7 +12,7 @@ int main()
 
 	list2.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
 	list2.MergeSort();
-	list2.MergeSort();
+
 	auto end = std::chrono::high_resolution_clock::now();
 	list2.PrintAll();
 
