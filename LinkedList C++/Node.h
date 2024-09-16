@@ -13,12 +13,12 @@ public:
 
 	Node* next; // Pointer to next node
 
-	T getValue() // Getter, so you can see the value.
+	T GetValue() // Getter, so you can see the value.
 	{
 		return value;
 	}
 
-	void setValue(T inputValue)  // Setter, to be able to change the value
+	void SetValue(T inputValue)  // Setter, to be able to change the value
 	{
 		value = inputValue;
 	}

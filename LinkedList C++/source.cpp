@@ -10,8 +10,9 @@ int main()
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	list2.AddTextFromFile("C:\\Users\\max.jensen\\Desktop\\text.txt");
-	list2.Sort2();
+	list2.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
+	list2.MergeSort();
+	list2.MergeSort();
 	auto end = std::chrono::high_resolution_clock::now();
 	list2.PrintAll();
 
