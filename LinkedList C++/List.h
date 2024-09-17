@@ -5,30 +5,33 @@
 #include <fstream>
 #include <algorithm>
 #include <type_traits>
+#include <thread>
 
 template <typename T>
 class List
 {
 private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
+	Node<T>* tail; // A pointer that keeps track of the end of the list. Saves time because the program no longer has to loop through the lsit to find the end
 	int listLength = 0;
+	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':' };
 
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
 	Node<T>* StartMergeSort(Node<T>* head);
 	T Parse(T value);
-	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':'};
 
 public:
 	List() // Constructor. It sets the head to null by default
 	{
 		head = nullptr;
+		tail = nullptr;
 	}
 
 	void BubbleSort();
 	void MergeSort();
-	void Add(T input);
+	void AddAtTail(T input);
 	void PrintAll();
 	int GetLength();
 	void Clear();
@@ -82,25 +85,20 @@ inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 }
 
 template<typename T>
-inline void List<T>::Add(T input)
+inline void List<T>::AddAtTail(T input)
 {
-	if (head == nullptr) // If there is no head node, make one with the input data
+	if (head == nullptr) // If there is no head node, make the new node the head and tail
 	{
 		head = new Node<T>(input);
-		listLength++;
+		tail = head;  // Since it's the only node, it’s also the tail
 	}
-	else // Moves along the list until the next node is null (meaning that the end has been reached)
+	else // Add the new node to the tail
 	{
-		Node<T>* current = head;
-		while (current->next != nullptr)
-		{
-			current = current->next;
-		}
-
-		// Add the input at the end of the list
-		current->next = new Node<T>(input);
-		listLength++;
+		tail->next = new Node<T>(input); // Link the new node to the last node
+		tail = tail->next;       // Update the tail to be the new node
 	}
+
+	listLength++;
 }
 
 template<typename T>
@@ -151,6 +149,7 @@ inline void List<T>::Clear()
 
 	// Can't delete head because then the list would be gone, but I can set it to null so it's empty. 
 	head = nullptr;
+	tail = nullptr;
 	listLength = 0;
 }
 
@@ -199,7 +198,7 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 			// Add the word to the list if it is not empty
 			if (!word.empty())
 			{
-				Add(word);
+				AddAtTail(word);
 			}
 		}
 	}
@@ -210,7 +209,7 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 template<typename T>
 inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
 {
-	if (head == nullptr || head->next == nullptr) return nullptr; // Return if the list is empty or has only one node
+	if (head == nullptr || head->next == nullptr) return nullptr; // Can't split if the list is empty or has only one node
 
 	Node<T>* slowPointer = head;
 	Node<T>* fastPointer = head->next;
@@ -219,8 +218,8 @@ inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
 	step until the fast one is at the end of the list. This is how the middle of the list is found.*/
 	while (fastPointer != nullptr && fastPointer->next != nullptr)
 	{
-		slowPointer = slowPointer->next;
 		fastPointer = fastPointer->next->next;
+		slowPointer = slowPointer->next;
 	}
 
 	Node<T>* secondHalf = slowPointer->next; // Second half starts at slowPointer->next
@@ -266,8 +265,18 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head)
 
 	Node<T>* secondHalf = SplitListInHalf(head); // Split into two halves
 
-	head = StartMergeSort(head); // Sort the first half
-	secondHalf = StartMergeSort(secondHalf);  // Sort the second half
+	std::thread firstHalfThread([this, &head]()
+	{
+		head = StartMergeSort(head); // Sort the first half
+	});
+	std::thread secondHalfThread([this, &secondHalf]()
+	{
+		secondHalf = StartMergeSort(secondHalf);  // Sort the second half
+	});
+
+	// Wait for both threads to finish
+	firstHalfThread.join();
+	secondHalfThread.join();
 
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
 }
