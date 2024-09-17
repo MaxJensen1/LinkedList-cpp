@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
+#include <type_traits>
 
 template <typename T>
 class List
@@ -12,10 +14,11 @@ private:
 	int listLength = 0;
 
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
-	std::string TryParse(T input);
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
 	Node<T>* StartMergeSort(Node<T>* head);
+	T Parse(T value);
+	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':'};
 
 public:
 	List() // Constructor. It sets the head to null by default
@@ -50,7 +53,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 		// Go through the list to compare each value with the next one
 		while (current != nullptr && current->next != nullptr)
 		{
-			if (TryParse(current->GetValue()) > TryParse(current->next->GetValue()))
+			if (Parse(current->GetValue()) > Parse(current->next->GetValue()))
 			{
 				SwapNodes(current, current->next);
 			}
@@ -106,7 +109,9 @@ inline void List<T>::PrintAll()
 	Node<T>* current = head;
 	while (current != nullptr) // While the current node exists, print it in the console
 	{
-		std::cout << TryParse(current->GetValue()) << std::endl;
+		std::stringstream stringStream;
+		stringStream << current->GetValue();
+		std::cout << stringStream.str() << std::endl;
 		current = current->next;
 	}
 }
@@ -166,69 +171,40 @@ inline bool List<T>::Contains(T input)
 }
 
 template<typename T>
-void List<T>::AddTextFromFile(const std::string& fileName) 
+void List<T>::AddTextFromFile(const std::string& fileName)
 {
 	std::ifstream inputFile(fileName);
 	std::string line;
 
-	while (std::getline(inputFile, line)) 
+	while (std::getline(inputFile, line))
 	{
 		std::stringstream stream(line);
 		std::string word;
 
-		while (stream >> word) 
+		while (stream >> word)
 		{
-			// Remove any commas or periods
-			if (!word.empty() && (word.back() == ',' || word.back() == '.' || word.back() == ')'))
+			// Remove any unwanted symbols from words
+			for (int i = 0; i < sizeof(bannedCharacters); i++) 
 			{
-				word.pop_back();
+				while (!word.empty() && word.back() == bannedCharacters[i]) // The end of words
+				{
+					word.pop_back();
+				}
+				while (!word.empty() && word.front() == bannedCharacters[i]) // The front of words
+				{
+					word.pop_back();
+				}
 			}
-			// Add the word to the list
-			Add(word);
+			
+			// Add the word to the list if it is not empty
+			if (!word.empty())
+			{
+				Add(word);
+			}
 		}
 	}
 
 	inputFile.close();
-}
-
-
-//template<typename T>
-//inline std::string List<T>::TryParse(T input)
-//{
-//	std::stringstream stringStream;
-//	stringStream << input; // Insert the input to the string stream
-//
-//	std::string result;
-//	stringStream >> result; // Pull out the converted value from the stream
-//
-//	// Check if conversion was successful and that no characters were left
-//	if (!stringStream.fail() && stringStream.eof())
-//	{
-//		return result;
-//	}
-//	else { return ""; } // Returning empty string if failed to avoid errors
-//}
-
-template<typename T>
-std::string List<T>::TryParse(T input)
-{
-	if constexpr (std::is_arithmetic<T>::value)
-	{
-		// If the variable is a number, convert it to a string
-		return std::to_string(input);
-	}
-	else if constexpr (std::is_same<T, std::string>::value)
-	{
-		// If the variable already is a string, there's no need to convert it
-		return input;
-	}
-	else
-	{
-		// Default case for unsupported types
-		std::stringstream stringStream;
-		stringStream << input;
-		return stringStream.str();
-	}
 }
 
 template<typename T>
@@ -265,9 +241,8 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	Node<T>* mergedList = nullptr;
 
 	// Compare the two halves and merge them accordingly
-	if (TryParse(firstHalf->GetValue()) <= TryParse(secondHalf->GetValue())) 
+	if (Parse(firstHalf->GetValue()) <= Parse(secondHalf->GetValue())) 
 	{
-		//std::cout << "Merging 1: '" << TryParse(firstHalf->GetValue()) << "' and '" << TryParse(secondHalf->GetValue()) << "'" << std::endl;
 		// First node of the first half is smaller, so link it to the merged list
 		mergedList = firstHalf;
 		// Recursively merge the rest of firstHalf with the secondHalf
@@ -279,7 +254,6 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 		mergedList = secondHalf;
 		// Recursively merge the firstHalf with the rest of secondHalf
 		mergedList->next = Merge(firstHalf, secondHalf->next);
-		//std::cout << "Merging 2: '" << TryParse(secondHalf->GetValue()) << "' and '" << TryParse(firstHalf->GetValue()) << "'" << std::endl;
 	}
 
 	return mergedList;
@@ -296,4 +270,25 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head)
 	secondHalf = StartMergeSort(secondHalf);  // Sort the second half
 
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
+}
+
+template<typename T>
+inline T List<T>::Parse(T value)
+{
+	T tempValue = value; // A copy of the value to return
+
+	if constexpr (std::is_same<T, std::string>::value)
+	{
+		std::transform(tempValue.begin(), tempValue.end(), tempValue.begin(), ::tolower); // If the variabe is a string, it to lowercase
+	}
+	else if constexpr (std::is_same<T, char>::value)
+	{
+		tempValue = std::tolower(tempValue); // If it's a char, convert it to lowercase
+	}
+	else if constexpr (std::is_arithmetic<T>::value) // If the type is arithmetic (number), do nothing
+	{
+		// Do nothing for numbers
+	}
+
+	return tempValue;
 }

@@ -7,13 +7,13 @@
 int main()
 {
 	List<std::string> list2;
+	list2.AddTextFromFile("C:\\Users\\max.jensen\\Desktop\\text.txt");
 
+	// Counting the time of the sorting algorithm
 	auto start = std::chrono::high_resolution_clock::now();
-
-	list2.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
 	list2.MergeSort();
-
 	auto end = std::chrono::high_resolution_clock::now();
+
 	list2.PrintAll();
 
 	std::chrono::duration<double> elapsed = end - start;
