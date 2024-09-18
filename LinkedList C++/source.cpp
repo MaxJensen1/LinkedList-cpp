@@ -7,12 +7,12 @@
 #include <Lmcons.h>
 
 std::string Username();
-std::string FileLocation();
+std::string FileFromDesktop(std::string fileName);
 
 int main()
 {
 	List<std::string> list;
-	list.AddTextFromFile(FileLocation());
+	list.AddTextFromFile(FileFromDesktop("text.txt"));
 
 	// Counting the time the sorting algorithm takes
 	auto start = std::chrono::high_resolution_clock::now();
@@ -37,10 +37,10 @@ std::string Username()
 	return std::string(username);
 }
 
-std::string FileLocation()
+std::string FileFromDesktop(std::string fileName)
 {
 	std::ostringstream oss;
-	oss << "C:\\Users\\" << Username() << "\\Desktop\\text.txt";
+	oss << "C:\\Users\\" << Username() << "\\Desktop\\" << fileName;
 	std::string fileLocation = oss.str();
 	return fileLocation;
 }
