@@ -9,7 +9,7 @@ int main()
 	List<std::string> list;
 	list.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
 
-	// Counting the time of the sorting algorithm
+	// Counting the time the sorting algorithm takes
 	auto start = std::chrono::high_resolution_clock::now();
 	list.MergeSort();
 	auto end = std::chrono::high_resolution_clock::now();
