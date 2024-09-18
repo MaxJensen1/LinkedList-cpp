@@ -54,7 +54,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 		Node<T>* current = head;
 
 		// Go through the list to compare each value with the next one
-		while (current != nullptr && current->next != nullptr)
+		while (current && current->next)
 		{
 			if (Parse(current->GetValue()) > Parse(current->next->GetValue()))
 			{
@@ -70,13 +70,13 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 template<typename T>
 inline void List<T>::MergeSort()
 {
-	head = StartMergeSort(head, 2);
+	head = StartMergeSort(head, 2); // Input head node and how deep multithreading should go
 }
 
 template<typename T>
 inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 {
-	if (node1 == nullptr || node2 == nullptr) { return; } // Safety check to avoid crashes
+	if (!node1 || !node2) { return; } // Safety check to avoid crashes
 
 	// Swap the value of the two nodes
 	T temporary = node1->GetValue();
@@ -87,7 +87,16 @@ inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 template<typename T>
 inline void List<T>::AddAtTail(T input)
 {
-	if (head == nullptr) // If there is no head node, make the new node the head and tail
+	if constexpr (std::is_same<T, std::string>::value)
+	{
+		std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+	}
+	else if (std::is_same<T, char>::value)
+	{
+		input = std::tolower(input);
+	}
+
+	if (!head) // If there is no head node, make the new node the head and tail
 	{
 		head = new Node<T>(input);
 		tail = head;  // Since it's the only node, it’s also the tail
@@ -105,7 +114,7 @@ template<typename T>
 inline void List<T>::PrintAll()
 {
 	Node<T>* current = head;
-	while (current != nullptr) // While the current node exists, print it in the console
+	while (current) // While the current node exists, print it in the console
 	{
 		std::stringstream stringStream;
 		stringStream << current->GetValue();
@@ -195,6 +204,9 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 				}
 			}
 			
+			// Convert the word to lowercase
+			std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+
 			// Add the word to the list if it is not empty
 			if (!word.empty())
 			{
@@ -240,7 +252,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	Node<T>* mergedList = nullptr;
 
 	// Compare the two halves and merge them accordingly
-	if (Parse(firstHalf->GetValue()) <= Parse(secondHalf->GetValue())) 
+	if ((firstHalf->GetValue()) <= (secondHalf->GetValue())) 
 	{
 		// First node of the first half is smaller, so link it to the merged list
 		mergedList = firstHalf;
@@ -294,6 +306,7 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
 }
 
+// Slows down the algorithm quite a lot, only use if nessacry
 template<typename T>
 inline T List<T>::Parse(T value)
 {
