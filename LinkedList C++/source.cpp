@@ -7,14 +7,14 @@
 int main()
 {
 	List<std::string> list;
-	list.AddTextFromFile("C:\\Users\\Max\\Desktop\\text.txt");
+	list.AddTextFromFile("C:\\Users\\max.jensen\\Desktop\\text.txt");
 
 	// Counting the time the sorting algorithm takes
 	auto start = std::chrono::high_resolution_clock::now();
 	list.MergeSort();
 	auto end = std::chrono::high_resolution_clock::now();
 
-	list.PrintAll();
+	//list.PrintAll();
 
 	std::chrono::duration<double> elapsed = end - start;
 	std::cout << "\nList length: " << list.CountLength() << std::endl;

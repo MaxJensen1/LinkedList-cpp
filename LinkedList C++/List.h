@@ -70,7 +70,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 template<typename T>
 inline void List<T>::MergeSort()
 {
-	head = StartMergeSort(head, 2); // Input head node and how deep multithreading should go
+	head = StartMergeSort(head, 1); // Input head node and how deep multithreading should go
 }
 
 template<typename T>
@@ -114,7 +114,7 @@ template<typename T>
 inline void List<T>::PrintAll()
 {
 	Node<T>* current = head;
-	while (current) // While the current node exists, print it in the console
+	while (current) // While the current node isn't null, print it in the console
 	{
 		std::stringstream stringStream;
 		stringStream << current->GetValue();
@@ -135,7 +135,7 @@ inline int List<T>::CountLength()
 	int count = 0;
 	Node<T>* current = head;
 
-	while (current != nullptr) // Move along the lsit until the end is reached and count while doing it
+	while (current) // Move along the lsit until the end is reached and count while doing it
 	{
 		count++;
 		current = current->next;
@@ -149,7 +149,7 @@ inline void List<T>::Clear()
 {
 	Node<T>* current = head;
 
-	while (current != nullptr) // Move along the list and temporarily save the next node so it can still be accessed after current has been deleted. 
+	while (current) // Move along the list and temporarily save the next node so it can still be accessed after current has been deleted. 
 	{
 		Node<T>* nextNode = current->next;
 		delete current;
@@ -166,7 +166,7 @@ template<typename T>
 inline bool List<T>::Contains(T input)
 {
 	Node<T>* current = head;
-	while (current != nullptr)
+	while (current)
 	{
 		if (current->GetValue() == input)
 		{
@@ -221,14 +221,14 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 template<typename T>
 inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
 {
-	if (head == nullptr || head->next == nullptr) return nullptr; // Can't split if the list is empty or has only one node
+	if (!head || !head->next) { return nullptr; } // Can't split if the list is empty or has only one node
 
 	Node<T>* slowPointer = head;
 	Node<T>* fastPointer = head->next;
 
 	/* Move the fast pointer two steps and the slow pointer one
 	step until the fast one is at the end of the list. This is how the middle of the list is found.*/
-	while (fastPointer != nullptr && fastPointer->next != nullptr)
+	while (fastPointer && fastPointer->next)
 	{
 		fastPointer = fastPointer->next->next;
 		slowPointer = slowPointer->next;
@@ -245,8 +245,8 @@ template<typename T>
 Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 {
 	// If either half is null, return the other half (base case for recursion)
-	if (firstHalf == nullptr) return secondHalf;
-	if (secondHalf == nullptr) return firstHalf;
+	if (!firstHalf) { return secondHalf; }
+	if (!secondHalf) { return firstHalf; }
 
 	// Dummy node to act as the start of the merged list
 	Node<T>* mergedList = nullptr;
@@ -273,7 +273,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 template<typename T>
 inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 {
-	if (head == nullptr || head->next == nullptr) { return head; } // If there is no head (empty list) or there is only one value, it can't be sorted
+	if (!head || !head->next) { return head; } // If there is no head (empty list) or there is only one value, it can't be sorted
 
 	Node<T>* secondHalf = SplitListInHalf(head); // Split into two halves
 
