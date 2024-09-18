@@ -70,7 +70,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 template<typename T>
 inline void List<T>::MergeSort()
 {
-	head = StartMergeSort(head, 1); // Input head node and how deep multithreading should go
+	head = StartMergeSort(head, 2); // Input head node and how deep multithreading should go
 }
 
 template<typename T>
@@ -118,7 +118,7 @@ inline void List<T>::PrintAll()
 	{
 		std::stringstream stringStream;
 		stringStream << current->GetValue();
-		std::cout << stringStream.str() << std::endl;
+		std::cout << stringStream.str() << "\n";
 		current = current->next;
 	}
 }
