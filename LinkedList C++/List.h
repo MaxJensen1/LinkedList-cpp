@@ -19,7 +19,7 @@ private:
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
-	Node<T>* StartMergeSort(Node<T>* head);
+	Node<T>* StartMergeSort(Node<T>* head, int threadDepth);
 	T Parse(T value);
 
 public:
@@ -70,7 +70,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 template<typename T>
 inline void List<T>::MergeSort()
 {
-	head = StartMergeSort(head);
+	head = StartMergeSort(head, 2);
 }
 
 template<typename T>
@@ -175,12 +175,12 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 	std::ifstream inputFile(fileName);
 	std::string line;
 
-	while (std::getline(inputFile, line))
+	while (std::getline(inputFile, line)) // Get one line at a time from the file
 	{
-		std::stringstream stream(line);
+		std::stringstream stream(line); // Create a stringstream from the line
 		std::string word;
 
-		while (stream >> word)
+		while (stream >> word) // Get one word at a time from the stream
 		{
 			// Remove any unwanted symbols from words
 			for (int i = 0; i < sizeof(bannedCharacters); i++) 
@@ -259,24 +259,37 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 }
 
 template<typename T>
-inline Node<T>* List<T>::StartMergeSort(Node<T>* head)
+inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 {
 	if (head == nullptr || head->next == nullptr) { return head; } // If there is no head (empty list) or there is only one value, it can't be sorted
 
 	Node<T>* secondHalf = SplitListInHalf(head); // Split into two halves
 
-	std::thread firstHalfThread([this, &head]()
+	// It will use threads when starting the split sorting if the variable is greater than 0. Its value determines how deep in the sorting multithreading will be utilized
+	if (threadDepth > 0)
 	{
-		head = StartMergeSort(head); // Sort the first half
-	});
-	std::thread secondHalfThread([this, &secondHalf]()
-	{
-		secondHalf = StartMergeSort(secondHalf);  // Sort the second half
-	});
+		threadDepth--;
 
-	// Wait for both threads to finish
-	firstHalfThread.join();
-	secondHalfThread.join();
+		// Important to include all variables the lambda function is allowed to access and change. Doesn't work otherwise
+		std::thread firstHalfThread([this, &head, threadDepth]()
+		{
+			head = StartMergeSort(head, threadDepth); // Sort the first half (sequentially)
+		});
+
+		std::thread secondHalfThread([this, &secondHalf, threadDepth]()
+		{
+			secondHalf = StartMergeSort(secondHalf, threadDepth);  // Sort the second half (sequentially)
+		});
+
+		// Wait for both threads to finish
+		firstHalfThread.join();
+		secondHalfThread.join();
+	}
+	else
+	{
+		head = StartMergeSort(head, threadDepth); // Sort the first half
+		secondHalf = StartMergeSort(secondHalf, threadDepth);  // Sort the second half
+	}
 
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
 }
