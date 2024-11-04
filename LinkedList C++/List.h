@@ -42,6 +42,12 @@ public:
 };
 
 template<typename T>
+inline void List<T>::MergeSort()
+{
+	head = StartMergeSort(head, threadDepth); // Input head node and how deep multithreading should go
+}
+
+template<typename T>
 inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 {
 	if (GetLength() < 2) // Can't sort a list with only one or no elements in it
@@ -49,7 +55,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 		return;
 	}
 
-	// Move along the list the same amount of times as values in the list
+	// Move along the list the same amount of times as values in the list minus one
 	for (int i = 0; i < GetLength() - 1; i++)
 	{
 		Node<T>* current = head;
@@ -57,7 +63,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 		// Go through the list to compare each value with the next one
 		while (current && current->next)
 		{
-			if (Parse(current->value) > Parse(current->next->value))
+			if (current->value > current->next->value)
 			{
 				SwapNodes(current, current->next);
 			}
@@ -66,12 +72,6 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 			current = current->next;
 		}
 	}
-}
-
-template<typename T>
-inline void List<T>::MergeSort()
-{
-	head = StartMergeSort(head, threadDepth); // Input head node and how deep multithreading should go
 }
 
 template<typename T>
