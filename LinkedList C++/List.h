@@ -14,6 +14,7 @@ private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
 	Node<T>* tail; // A pointer that keeps track of the end of the list. Saves time because the program no longer has to loop through the lsit to find the end
 	int listLength = 0;
+	uint8_t threadDepth = 2;
 	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':' };
 
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
@@ -35,7 +36,7 @@ public:
 	void PrintAll();
 	int GetLength();
 	void Clear();
-	bool Contains(T input);
+	bool Contains(T input); 
 	void AddTextFromFile(const std::string& fileName);
 	int CountLength();
 };
@@ -70,7 +71,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 template<typename T>
 inline void List<T>::MergeSort()
 {
-	head = StartMergeSort(head, 2); // Input head node and how deep multithreading should go
+	head = StartMergeSort(head, threadDepth); // Input head node and how deep multithreading should go
 }
 
 template<typename T>
