@@ -10,9 +10,4 @@ public:
 
 	Node* next; // Pointer to next node
 	T value;
-
-	void SetValue(T inputValue)  // Setter, to be able to change the value
-	{
-		value = inputValue;
-	}
 };

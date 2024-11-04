@@ -20,7 +20,7 @@ private:
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
 	Node<T>* StartMergeSort(Node<T>* head, int threadDepth);
-	T Parse(T value);
+	//T Parse(T value);
 
 public:
 	List() // Constructor. It sets the head to null by default
@@ -80,8 +80,8 @@ inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 
 	// Swap the value of the two nodes
 	T temporary = node1->value;
-	node1->SetValue(node2->value);
-	node2->SetValue(temporary);
+	node1->value = node2->value;
+	node2->value = temporary;
 }
 
 template<typename T>
@@ -99,12 +99,12 @@ inline void List<T>::AddAtTail(T input)
 	if (!head) // If there is no head node, make the new node the head and tail
 	{
 		head = new Node<T>(input);
-		tail = head;  // Since it's the only node, it's also the tail
+		tail = head; // Since it's the only node, it's also the tail
 	}
 	else // Add the new node to the tail
 	{
 		tail->next = new Node<T>(input); // Link the new node to the last node
-		tail = tail->next;       // Update the tail to be the new node
+		tail = tail->next; // Update the tail to be the new node
 	}
 
 	listLength++;
@@ -307,23 +307,23 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 }
 
 // Slows down the algorithm quite a lot, only use if absolutely nessacry
-template<typename T>
-inline T List<T>::Parse(T value)
-{
-	T tempValue = value; // A copy of the value to return
-
-	if constexpr (std::is_same<T, std::string>::value)
-	{
-		std::transform(tempValue.begin(), tempValue.end(), tempValue.begin(), ::tolower); // If the variabe is a string, it to lowercase
-	}
-	else if constexpr (std::is_same<T, char>::value)
-	{
-		tempValue = std::tolower(tempValue); // If it's a char, convert it to lowercase
-	}
-	else if constexpr (std::is_arithmetic<T>::value) // If the type is arithmetic (number), do nothing
-	{
-		// Do nothing for numbers
-	}
-
-	return tempValue;
-}
+//template<typename T>
+//inline T List<T>::Parse(T value)
+//{
+//	T tempValue = value; // A copy of the value to return
+//
+//	if constexpr (std::is_same<T, std::string>::value)
+//	{
+//		std::transform(tempValue.begin(), tempValue.end(), tempValue.begin(), ::tolower); // If the variabe is a string, it to lowercase
+//	}
+//	else if constexpr (std::is_same<T, char>::value)
+//	{
+//		tempValue = std::tolower(tempValue); // If it's a char, convert it to lowercase
+//	}
+//	else if constexpr (std::is_arithmetic<T>::value) // If the type is arithmetic (number), do nothing
+//	{
+//		// Do nothing for numbers
+//	}
+//
+//	return tempValue;
+//}
