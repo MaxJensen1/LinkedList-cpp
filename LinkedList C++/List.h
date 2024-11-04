@@ -99,7 +99,7 @@ inline void List<T>::AddAtTail(T input)
 	if (!head) // If there is no head node, make the new node the head and tail
 	{
 		head = new Node<T>(input);
-		tail = head;  // Since it's the only node, it’s also the tail
+		tail = head;  // Since it's the only node, it's also the tail
 	}
 	else // Add the new node to the tail
 	{
@@ -192,7 +192,7 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 		while (stream >> word) // Get one word at a time from the stream
 		{
 			// Remove any unwanted symbols from words
-			for (int i = 0; i < sizeof(bannedCharacters); i++) 
+			for (uint16_t i = 0; i < sizeof(bannedCharacters); i++) 
 			{
 				while (!word.empty() && word.back() == bannedCharacters[i]) // The end of words
 				{
