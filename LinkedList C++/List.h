@@ -56,7 +56,7 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 		// Go through the list to compare each value with the next one
 		while (current && current->next)
 		{
-			if (Parse(current->GetValue()) > Parse(current->next->GetValue()))
+			if (Parse(current->value) > Parse(current->next->value))
 			{
 				SwapNodes(current, current->next);
 			}
@@ -79,8 +79,8 @@ inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 	if (!node1 || !node2) { return; } // Safety check to avoid crashes
 
 	// Swap the value of the two nodes
-	T temporary = node1->GetValue();
-	node1->SetValue(node2->GetValue());
+	T temporary = node1->value;
+	node1->SetValue(node2->value);
 	node2->SetValue(temporary);
 }
 
@@ -117,7 +117,7 @@ inline void List<T>::PrintAll()
 	while (current) // While the current node isn't null, print it in the console
 	{
 		std::stringstream stringStream;
-		stringStream << current->GetValue();
+		stringStream << current->value;
 		std::cout << stringStream.str() << "\n";
 		current = current->next;
 	}
@@ -168,7 +168,7 @@ inline bool List<T>::Contains(T input)
 	Node<T>* current = head;
 	while (current)
 	{
-		if (current->GetValue() == input)
+		if (current->value == input)
 		{
 			return true;
 		}
@@ -252,7 +252,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	Node<T>* mergedList = nullptr;
 
 	// Compare the two halves and merge them accordingly
-	if ((firstHalf->GetValue()) <= (secondHalf->GetValue())) 
+	if ((firstHalf->value) <= (secondHalf->value)) 
 	{
 		// First node of the first half is smaller, so link it to the merged list
 		mergedList = firstHalf;
@@ -306,7 +306,7 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
 }
 
-// Slows down the algorithm quite a lot, only use if nessacry
+// Slows down the algorithm quite a lot, only use if absolutely nessacry
 template<typename T>
 inline T List<T>::Parse(T value)
 {
