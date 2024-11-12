@@ -6,13 +6,14 @@
 #include <algorithm>
 #include <type_traits>
 #include <thread>
+#include <random>
 
 template <typename T>
 class List
 {
 private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
-	Node<T>* tail; // A pointer that keeps track of the end of the list. Saves time because the program no longer has to loop through the lsit to find the end
+	Node<T>* tail; // A pointer that keeps track of the end of the list. Saves time because the program no longer has to loop through the list to find the end
 	int listLength = 0;
 	uint8_t threadDepth = 2;
 	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':' };
@@ -21,7 +22,8 @@ private:
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
 	Node<T>* StartMergeSort(Node<T>* head, int threadDepth);
-	//T Parse(T value);
+	Node<T>* GetNodeAtIndex(int index);
+	T Parse(T value);
 
 public:
 	List() // Constructor. It sets the head to null by default
@@ -30,6 +32,7 @@ public:
 		tail = nullptr;
 	}
 
+	// Features avaiable to users
 	void BubbleSort();
 	void MergeSort();
 	void AddAtTail(T input);
@@ -39,14 +42,23 @@ public:
 	bool Contains(T input); 
 	void AddTextFromFile(const std::string& fileName);
 	int CountLength();
+	void Scramble(int iterations);
 };
 
+/// <summary>
+/// Sorts the list using a merge sort algorithm.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template<typename T>
 inline void List<T>::MergeSort()
 {
 	head = StartMergeSort(head, threadDepth); // Input head node and how deep multithreading should go
 }
 
+/// <summary>
+/// Sorts the list using a bubble sort algorithm.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template<typename T>
 inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 {
@@ -74,6 +86,12 @@ inline void List<T>::BubbleSort() // Sorting algorithm of the type bubble sort
 	}
 }
 
+/// <summary>
+/// Swaps place of the value of two nodes.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="node1"></param>
+/// <param name="node2"></param>
 template<typename T>
 inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 {
@@ -85,6 +103,11 @@ inline void List<T>::SwapNodes(Node<T>* node1, Node<T>* node2)
 	node2->value = temporary;
 }
 
+/// <summary>
+/// Adds a value at the end of the list.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="input"></param>
 template<typename T>
 inline void List<T>::AddAtTail(T input)
 {
@@ -111,6 +134,10 @@ inline void List<T>::AddAtTail(T input)
 	listLength++;
 }
 
+/// <summary>
+/// Prints the entire list.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template<typename T>
 inline void List<T>::PrintAll()
 {
@@ -124,12 +151,22 @@ inline void List<T>::PrintAll()
 	}
 }
 
+/// <summary>
+/// Returns an int of the list length that is being updated when adding or removing elements.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <returns></returns>
 template<typename T>
 inline int List<T>::GetLength()
 {
 	return listLength;
 }
 
+/// <summary>
+/// Loops through the entire list and counts the amount of elements.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <returns></returns>
 template<typename T>
 inline int List<T>::CountLength()
 {
@@ -145,6 +182,66 @@ inline int List<T>::CountLength()
 	return count;
 }
 
+/// <summary>
+/// Scrambles the list by swapping random nodes. Iterations variable decides how many times it is repeated.
+/// For a well scrambled list it is recommended to do it listLength amount of times.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+template<typename T>
+inline void List<T>::Scramble(int iterations)
+{
+	// Exception handling
+	if (listLength <= 1) { return; }
+	if (iterations <= 0) { iterations = listLength; }
+
+	std::random_device rd;
+	std::mt19937 generator(rd());
+	std::uniform_int_distribution<> randomElement(0, listLength - 1);
+
+	for (int i = 0; i < iterations; i++)
+	{
+		int index1 = randomElement(generator);
+		int index2 = randomElement(generator);
+
+		// Can't use the same node twice
+		while (index1 == index2)
+		{
+			index2 = randomElement(generator);
+		}
+
+		Node<T>* node1 = GetNodeAtIndex(index1);
+		Node<T>* node2 = GetNodeAtIndex(index2);
+
+		SwapNodes(node1, node2);
+	}
+}
+
+/// <summary>
+/// Returns a Node pointer at specified index.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="index"></param>
+/// <returns></returns>
+template<typename T>
+inline Node<T>* List<T>::GetNodeAtIndex(int index)
+{
+	if (index < 0 || index >= listLength) // Out of bounds check
+	{
+		return nullptr; 
+	}
+
+	Node<T>* current = head;
+	for (int i = 0; i < index; i++)
+	{
+		current = current->next;
+	}
+	return current;
+}
+
+/// <summary>
+/// Clears the list.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 template<typename T>
 inline void List<T>::Clear()
 {
@@ -163,6 +260,12 @@ inline void List<T>::Clear()
 	listLength = 0;
 }
 
+/// <summary>
+/// Loops through the list and returns true if the input is found.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="input"></param>
+/// <returns></returns>
 template<typename T>
 inline bool List<T>::Contains(T input)
 {
@@ -179,6 +282,11 @@ inline bool List<T>::Contains(T input)
 	return false;
 }
 
+/// <summary>
+/// Opens specified file and reads from it. Each word separated by a space gets added as a separate element.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="fileName"></param>
 template<typename T>
 void List<T>::AddTextFromFile(const std::string& fileName)
 {
@@ -219,6 +327,12 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 	inputFile.close();
 }
 
+/// <summary>
+/// Splits list in half and returns the second half.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="head"></param>
+/// <returns></returns>
 template<typename T>
 inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
 {
@@ -241,7 +355,13 @@ inline Node<T>* List<T>::SplitListInHalf(Node<T>* head)
 	return secondHalf; // Return the start of the second half
 }
 
-// Used to merge two lists after they have been split and sorted
+/// <summary>
+/// Merges two halves of the list and returns the first node in the merged list.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="firstHalf"></param>
+/// <param name="secondHalf"></param>
+/// <returns></returns>
 template<typename T>
 Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 {
@@ -250,7 +370,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	if (!secondHalf) { return firstHalf; }
 
 	// Dummy node to act as the start of the merged list
-	Node<T>* mergedList = nullptr;
+	Node<T>* mergedList = nullptr;	
 
 	// Compare the two halves and merge them accordingly
 	if ((firstHalf->value) <= (secondHalf->value)) 
@@ -271,6 +391,13 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 	return mergedList;
 }
 
+/// <summary>
+/// Recursive merge sorting.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="head"></param>
+/// <param name="threadDepth"></param>
+/// <returns></returns>
 template<typename T>
 inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 {
@@ -307,24 +434,29 @@ inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
 	return Merge(head, secondHalf); // Merge the two sorted halves and return it as one list
 }
 
-// Slows down the algorithm quite a lot, only use if absolutely nessacry
-//template<typename T>
-//inline T List<T>::Parse(T value)
-//{
-//	T tempValue = value; // A copy of the value to return
-//
-//	if constexpr (std::is_same<T, std::string>::value)
-//	{
-//		std::transform(tempValue.begin(), tempValue.end(), tempValue.begin(), ::tolower); // If the variabe is a string, it to lowercase
-//	}
-//	else if constexpr (std::is_same<T, char>::value)
-//	{
-//		tempValue = std::tolower(tempValue); // If it's a char, convert it to lowercase
-//	}
-//	else if constexpr (std::is_arithmetic<T>::value) // If the type is arithmetic (number), do nothing
-//	{
-//		// Do nothing for numbers
-//	}
-//
-//	return tempValue;
-//}
+/// <summary>
+/// Converts strings and chars to lower case, and does nothing to numbers.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="value"></param>
+/// <returns></returns>
+template<typename T>
+inline T List<T>::Parse(T value) // Slows down the algorithm quite a lot, only use if absolutely nessacry
+{
+	T tempValue = value; // A copy of the value to return
+
+	if constexpr (std::is_same<T, std::string>::value)
+	{
+		std::transform(tempValue.begin(), tempValue.end(), tempValue.begin(), ::tolower); // If the variabe is a string, it to lowercase
+	}
+	else if constexpr (std::is_same<T, char>::value)
+	{
+		tempValue = std::tolower(tempValue); // If it's a char, convert it to lowercase
+	}
+	else if constexpr (std::is_arithmetic<T>::value) // If the type is arithmetic (number), do nothing
+	{
+		// Do nothing for numbers
+	}
+
+	return tempValue;
+}

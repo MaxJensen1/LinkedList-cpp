@@ -10,10 +10,15 @@ std::string FileFromDesktop(std::string fileName);
 
 int main()
 {
-	for (int i = 0; i < 5; i++)
+	uint8_t testRuns = 10;
+	double totalTime = 0;
+
+	List<std::string> list;
+	list.AddTextFromFile(FileFromDesktop("text.txt"));
+
+	for (int i = 0; i < testRuns; i++)
 	{
-		List<std::string> list;
-		list.AddTextFromFile(FileFromDesktop("text.txt"));
+		list.Scramble(list.GetLength()*2);	
 
 		// Counting the time the sorting algorithm takes
 		auto start = std::chrono::high_resolution_clock::now();
@@ -23,9 +28,11 @@ int main()
 		//list.PrintAll();
 
 		std::chrono::duration<double> elapsed = end - start;
-		std::cout << "\nList length: " << list.CountLength() << std::endl;
-		std::cout << "Operation took " << elapsed.count() << " seconds." << std::endl;
+		totalTime += elapsed.count();
+		std::cout << "Sorted " << list.GetLength() << " words in " << elapsed.count() << " seconds.\n";
 	}
+
+	std::cout << "\nAverage time to sort: " << totalTime / testRuns << " seconds." << std::endl;
 }
 
 std::string Username()
