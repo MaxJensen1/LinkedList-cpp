@@ -13,12 +13,11 @@ int main()
 	uint8_t testRuns = 10;
 	double totalTime = 0;
 
-	List<std::string> list;
-	list.AddTextFromFile(FileFromDesktop("text.txt"));
-
 	for (int i = 0; i < testRuns; i++)
 	{
-		list.Scramble(list.GetLength()*2);	
+		//list.Scramble(list.GetLength()*2);	
+		List<std::string> list;
+		list.AddTextFromFile(FileFromDesktop("text.txt"));
 
 		// Counting the time the sorting algorithm takes
 		auto start = std::chrono::high_resolution_clock::now();
