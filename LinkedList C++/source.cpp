@@ -8,7 +8,7 @@
 
 int main()
 {
-	uint8_t testRuns = 100;
+	int testRuns = 100;
 	double totalTime = 0;
 	Filepath file;
 
@@ -32,5 +32,6 @@ int main()
 	}
 
 	double averageTime = totalTime / testRuns;
-	std::cout << "\n- - - - - - - - - - - - - - - - - - - - \nAverage time to sort: " << averageTime << " seconds (" << averageTime * 1000 << " milliseconds)." << std::endl;
+	std::cout << "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n";
+	std::cout << "Sorted " << testRuns << " times. Average time to sort: " << averageTime << " seconds(" << averageTime * 1000 << " milliseconds)." << std::endl;
 }
