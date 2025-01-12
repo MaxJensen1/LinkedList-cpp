@@ -4,26 +4,26 @@
 #include <chrono>
 #include <windows.h>
 #include <Lmcons.h>
-
-std::string Username();
-std::string FileFromDesktop(std::string fileName);
+#include "Filepath.h"
 
 int main()
 {
-	uint8_t testRuns = 10;
+	uint8_t testRuns = 100;
 	double totalTime = 0;
+	Filepath file;
 
 	for (int i = 0; i < testRuns; i++)
 	{
-		//list.Scramble(list.GetLength()*2);	
+		// Create the list isnide the loop so it is reset every test run.
 		List<std::string> list;
-		list.AddTextFromFile(FileFromDesktop("text.txt"));
+		list.AddTextFromFile(file.FileFromDesktop("text.txt"));
 
 		// Counting the time the sorting algorithm takes
 		auto start = std::chrono::high_resolution_clock::now();
 		list.MergeSort();
 		auto end = std::chrono::high_resolution_clock::now();
 
+		// Prints the whole sorted list (commented out to save time).
 		//list.PrintAll();
 
 		std::chrono::duration<double> elapsed = end - start;
@@ -31,24 +31,6 @@ int main()
 		std::cout << "Sorted " << list.GetLength() << " words in " << elapsed.count() << " seconds.\n";
 	}
 
-	std::cout << "\nAverage time to sort: " << totalTime / testRuns << " seconds." << std::endl;
-}
-
-std::string Username()
-{
-    char username[UNLEN + 1];
-    DWORD username_len = UNLEN + 1;
-
-    // Get the username from the system
-    GetUserNameA(username, &username_len);
-    
-	return std::string(username);
-}
-
-std::string FileFromDesktop(std::string fileName)
-{
-	std::ostringstream oss;
-	oss << "C:\\Users\\" << Username() << "\\Desktop\\" << fileName;
-	std::string fileLocation = oss.str();
-	return fileLocation;
+	double averageTime = totalTime / testRuns;
+	std::cout << "\n- - - - - - - - - - - - - - - - - - - - \nAverage time to sort: " << averageTime << " seconds (" << averageTime * 1000 << " milliseconds)." << std::endl;
 }
