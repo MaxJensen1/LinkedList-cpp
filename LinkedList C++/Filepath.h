@@ -7,7 +7,15 @@
 class Filepath
 {
 public:
+	enum FilepathEnum
+	{
+		DESKTOP,
+		DOCUMENTS,
+		DOWNLOADS,
+		VIDEOS
+	};
 
+protected:
 	/// <summary>
 	/// Returns the Windows user's username.
 	/// </summary>
@@ -23,16 +31,26 @@ public:
 		return std::string(username);
 	}
 
-	/// <summary>
-	/// Returns the filepath of the input file name on the desktop.
-	/// </summary>
-	/// <param name="fileName"></param>
-	/// <returns></returns>
-	std::string FileFromDesktop(std::string fileName)
+	std::string EnumToPath(FilepathEnum fileLocation)
 	{
-		std::ostringstream oss;
-		oss << "C:\\Users\\" << Username() << "\\Desktop\\" << fileName;
-		std::string fileLocation = oss.str();
-		return fileLocation;
+		std::string basePath = "C:\\Users\\" + Username() + "\\";
+
+		switch (fileLocation)
+		{
+		case DESKTOP:
+			return basePath + "Desktop\\";
+
+		case DOCUMENTS:
+			return basePath + "Documents\\";
+
+		case DOWNLOADS:
+			return basePath + "Downloads\\";
+
+		case VIDEOS:
+			return basePath + "Videos\\";
+
+		default:
+			throw std::invalid_argument("Invalid FilepathEnum value");
+		}
 	}
 };

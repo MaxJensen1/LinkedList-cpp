@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
-#include <string>
+#include "Filepath.h"
+#include <string.h>
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -9,7 +10,7 @@
 #include <random>
 
 template <typename T>
-class List
+class List: public Filepath
 {
 private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
@@ -40,7 +41,8 @@ public:
 	int GetLength();
 	void Clear();
 	bool Contains(T input); 
-	void AddTextFromFile(const std::string& fileName);
+	void AddTextFromFile(FilepathEnum fileLocation, const std::string& fileName);
+	void WriteOutputToFile(FilepathEnum saveLocation, std::string fileName);
 	int CountLength();
 	void Scramble(int iterations);
 };
@@ -288,9 +290,9 @@ inline bool List<T>::Contains(T input)
 /// <typeparam name="T"></typeparam>
 /// <param name="fileName"></param>
 template<typename T>
-void List<T>::AddTextFromFile(const std::string& fileName)
+void List<T>::AddTextFromFile(FilepathEnum fileLocation, const std::string& fileName)
 {
-	std::ifstream inputFile(fileName);
+	std::ifstream inputFile(EnumToPath(fileLocation) + fileName + ".txt");
 	std::string line;
 
 	while (std::getline(inputFile, line)) // Get one line at a time from the file
@@ -325,6 +327,26 @@ void List<T>::AddTextFromFile(const std::string& fileName)
 	}
 
 	inputFile.close();
+}
+
+template<typename T>
+inline void List<T>::WriteOutputToFile(FilepathEnum saveLocation, std::string fileName)
+{
+	std::ofstream outputFile;
+	std::string fullFilePath = EnumToPath(saveLocation) + fileName + ".txt";
+
+	if (outputFile.is_open() == false)
+	{
+		// Out means that it is meant to write data to. Add stdd:ios:app if you don't want it to clear every time the program starts. 
+		outputFile.open(fullFilePath, std::ios::app);
+	}
+
+	Node<T>* current = head;
+	while (current)
+	{
+		outputFile << current->value << std::endl;
+		current = current->next;
+	}
 }
 
 /// <summary>

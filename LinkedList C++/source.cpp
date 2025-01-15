@@ -4,19 +4,17 @@
 #include <chrono>
 #include <windows.h>
 #include <Lmcons.h>
-#include "Filepath.h"
 
 int main()
 {
-	int testRuns = 100;
+	int testRuns = 1;
 	double totalTime = 0;
-	Filepath file;
 
 	for (int i = 0; i < testRuns; i++)
 	{
 		// Create the list isnide the loop so it is reset every test run.
 		List<std::string> list;
-		list.AddTextFromFile(file.FileFromDesktop("text.txt"));
+		list.AddTextFromFile(list.DESKTOP, "text");
 
 		// Counting the time the sorting algorithm takes
 		auto start = std::chrono::high_resolution_clock::now();
@@ -25,6 +23,7 @@ int main()
 
 		// Prints the whole sorted list (commented out to save time).
 		//list.PrintAll();
+		list.WriteOutputToFile(list.DESKTOP, "cppOutput");
 
 		std::chrono::duration<double> elapsed = end - start;
 		totalTime += elapsed.count();
