@@ -16,13 +16,13 @@ private:
 	Node<T>* head; // Using a pointer so save space and time. I can refer to the memory adress when I need to access the head node
 	Node<T>* tail; // A pointer that keeps track of the end of the list. Saves time because the program no longer has to loop through the list to find the end
 	int listLength = 0;
-	uint8_t threadDepth = 2;
-	char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':' };
+	static constexpr uint8_t threadDepth = 2;
+	static constexpr char bannedCharacters[7] = { ',', '.', '(', ')', '"', ';', ':' };
 
 	void SwapNodes(Node<T>* node1, Node<T>* node2);
 	Node<T>* SplitListInHalf(Node<T>* head);
 	Node<T>* Merge(Node<T>* left, Node<T>* right);
-	Node<T>* StartMergeSort(Node<T>* head, int threadDepth);
+	Node<T>* StartMergeSort(Node<T>* head, uint8_t threadDepth);
 	Node<T>* GetNodeAtIndex(int index);
 	T Parse(T value);
 
@@ -37,14 +37,19 @@ public:
 	void BubbleSort();
 	void MergeSort();
 	void AddAtTail(T input);
+	void AddAtIndex(T input, int index);
 	void PrintAll();
 	int GetLength();
+	void ReverseOrder();
+	void RemoveAt(int index);
+	void RemoveFromTo(int index1, int index2);
 	void Clear();
 	bool Contains(T input); 
 	void AddTextFromFile(FilepathEnum fileLocation, const std::string& fileName);
 	void WriteOutputToFile(FilepathEnum saveLocation, std::string fileName);
 	int CountLength();
 	void Scramble(int iterations);
+	void LogError(const std::string& message);
 };
 
 /// <summary>
@@ -136,6 +141,42 @@ inline void List<T>::AddAtTail(T input)
 	listLength++;
 }
 
+template<typename T>
+inline void List<T>::AddAtIndex(T input, int index)
+{
+	// Out of bounds check
+	if (index < 0 || index > GetLength()) { return; }
+
+	// Insert at head
+	if (index == 0)
+	{
+		Node<T>* newNode = new Node<T>(input);
+		newNode->next = head;
+		head = newNode;
+		listLength++;
+		return;
+	}
+
+	// Insert at tail
+	if (index == GetLength())
+	{
+		AddAtTail(input); // Assume AddAtTail correctly increments listLength
+		return;
+	}
+
+	// General case
+	Node<T>* current = head;
+	for (int i = 0; i < index - 1; i++)
+	{
+		current = current->next;
+	}
+
+	Node<T>* newNode = new Node<T>(input);
+	newNode->next = current->next; // Correctly link to the next node
+	current->next = newNode;
+	listLength++; // Increment length
+}
+
 /// <summary>
 /// Prints the entire list.
 /// </summary>
@@ -165,7 +206,143 @@ inline int List<T>::GetLength()
 }
 
 /// <summary>
-/// Loops through the entire list and counts the amount of elements.
+/// Reverses the order of the list.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+template<typename T>
+inline void List<T>::ReverseOrder()
+{
+	Node<T>* previous = nullptr;
+	Node<T>* current = head;
+	Node<T>* next = nullptr;
+
+	// The new end of the list will be the current head.
+	tail = head;
+
+	// Traverse all the nodes of the list.
+	while (current)
+	{
+		next = current->next;  // Save the next node.
+		current->next = previous;  // Reverse the link.
+		previous = current;  // Move previous forward.
+		current = next;  // Move current forward.
+	}
+
+	// Update head so the start of the list doesn't get lost.
+	head = previous;
+}
+
+/// <summary>
+/// Removes the element at specified index.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="index"></param>
+template<typename T>
+inline void List<T>::RemoveAt(int index)
+{
+	// Prevent out of bounds errors.
+	if (index >= GetLength() || index < 0)
+	{
+		return;
+	}
+
+	// Update head if first element is removed.
+	if (index == 0)
+	{
+		Node<T>* toDelete = head;	// Save pointer to current head.
+		head = head->next;         // Update head to the next node.
+		delete toDelete;          // Delete the old head.
+		return;
+	}
+
+	Node<T>* current = head;
+	// Get the node before before the index. 
+	for (int i = 0; i < index - 1; i++)
+	{
+		current = current->next;
+	}
+
+	// Move pointer from current to current->next->next, then remove the saved current->next pointer. 
+	Node<T>* toDelete = current->next;
+	current->next = toDelete->next;
+	delete toDelete;
+
+	listLength--; // Update listLength.
+}
+
+/// <summary>
+/// Removes elements from index1 to index2 (inclusive-inclusive).
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <param name="index1"></param>
+/// <param name="index2"></param>
+template<typename T>
+inline void List<T>::RemoveFromTo(int index1, int index2) 
+{
+	// Check if the list is empty.
+	if (head == nullptr || listLength == 0)
+	{ 
+		//LogError("RemoveFromTo called on empty list.");
+		return;
+	}
+
+	// Ensure index1 <= index2, and swaps them if needed.
+	if (index1 > index2) 
+	{
+		std::swap(index1, index2);
+	}
+
+	// Validate indices
+	if (index1 < 0 || index2 >= listLength) 
+	{
+		//LogError("Invalid indices [" + std::to_string(index1) + ", " + std::to_string(index2) +"]. List length: " + std::to_string(listLength));
+		return;
+	}
+
+	// Traverse to the node before index1 ("prev1") and the node at index1 ("node1")
+	Node<T>* prev1 = nullptr;
+	Node<T>* node1 = head;
+	for (int i = 0; i < index1; i++) 
+	{
+		prev1 = node1;
+		node1 = node1->next;
+	}
+
+	// Traverse from node1 to node2 (index2 - index1 steps)
+	Node<T>* node2 = node1;
+	for (int i = 0; i < (index2 - index1); i++) 
+	{
+		node2 = node2->next;
+	}
+
+	// Update links to "skip" the nodes being removed
+	if (prev1 != nullptr) 
+	{
+		prev1->next = node2->next; // Bypass nodes from index1 to index2
+	}
+	else 
+	{
+		head = node2->next; // Update head if removing from the start
+	}
+
+	// Delete nodes between node1 and node2 (inclusive)
+	int nodesToRemove = index2 - index1 + 1;
+	Node<T>* current = node1;
+	Node<T>* nextNode = nullptr;
+
+	while (nodesToRemove--) 
+	{
+		nextNode = current->next;
+		delete current;
+		current = nextNode;
+	}
+
+	// Update list length
+	listLength -= (index2 - index1 + 1);
+}
+
+/// <summary>
+/// Goes through the entire list and counts the amount of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <returns></returns>
@@ -227,7 +404,7 @@ inline void List<T>::Scramble(int iterations)
 template<typename T>
 inline Node<T>* List<T>::GetNodeAtIndex(int index)
 {
-	if (index < 0 || index >= listLength) // Out of bounds check
+	if (index < 0 || index >= GetLength()) // Out of bounds check
 	{
 		return nullptr; 
 	}
@@ -421,7 +598,7 @@ Node<T>* List<T>::Merge(Node<T>* firstHalf, Node<T>* secondHalf)
 /// <param name="threadDepth"></param>
 /// <returns></returns>
 template<typename T>
-inline Node<T>* List<T>::StartMergeSort(Node<T>* head, int threadDepth)
+inline Node<T>* List<T>::StartMergeSort(Node<T>* head, uint8_t threadDepth)
 {
 	if (!head || !head->next) { return head; } // If there is no head (empty list) or there is only one value, it can't be sorted
 
@@ -481,4 +658,17 @@ inline T List<T>::Parse(T value) // Slows down the algorithm quite a lot, only u
 	}
 
 	return tempValue;
+}
+
+// Example logging function (customize as needed)
+template<typename T>
+void List<T>::LogError(const std::string& message)
+{
+	std::ofstream logFile("LinkedList_Errors.log", std::ios::app);
+	if (logFile.is_open()) 
+	{
+		logFile << "[ERROR] " << message << "\n";
+		logFile.close();
+	}
+	std::cerr << "Error: " << message << "\n";
 }
